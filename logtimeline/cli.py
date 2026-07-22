@@ -29,7 +29,7 @@ from typing import TextIO
 
 from .parser import parse_file, parse_lines
 from .merger import merge_sources
-from .render import render_stream
+from .render import render_stream, render_json_stream
 
 
 def parse_source_spec(spec: str, default_name_fn) -> tuple[str, str]:
@@ -110,6 +110,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "timestamps instead of relying on auto-detection. Repeatable.",
     )
     p.add_argument(
+        "--format",
+        choices=["text", "json"],
+        default="text",
+        help="Output format. 'text' is the human-readable v1 default. "
+        "'json' emits JSON Lines (one object per entry) for downstream "
+        "tools such as logexplain.",
+    )
+    p.add_argument(
         "-o",
         "--output",
         metavar="PATH",
@@ -157,13 +165,14 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     merged = merge_sources(sources)
+    renderer = render_json_stream if args.format == "json" else render_stream
 
     out: TextIO
     if args.output:
         with open(args.output, "w") as out:
-            render_stream(merged, out)
+            renderer(merged, out)
     else:
-        render_stream(merged, sys.stdout)
+        renderer(merged, sys.stdout)
 
     return 0
 

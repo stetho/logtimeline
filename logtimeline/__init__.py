@@ -1,6 +1,6 @@
 from .parser import LogEntry, detect_timestamp, parse_file, parse_lines
 from .merger import MergedEntry, merge_sources
-from .render import render_entry, render_stream
+from .render import render_entry, render_stream, render_json_stream, entry_to_dict
 
 __all__ = [
     "LogEntry",
@@ -11,4 +11,6 @@ __all__ = [
     "merge_sources",
     "render_entry",
     "render_stream",
+    "render_json_stream",
+    "entry_to_dict",
 ]
